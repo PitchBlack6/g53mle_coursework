@@ -24,4 +24,4 @@ def obtain_data():
     temp=np.array([angle_array[:,0]])
     features = (whole_data - 200) / 2000  # 367616, 98
     labels = temp.transpose()  # 367616, 1
-    return features, labels
+    return features, label
