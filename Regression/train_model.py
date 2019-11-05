@@ -156,12 +156,12 @@ with tf.Session() as sess:
 
     output_test = neural_network.eval({X: X_test})
 
-    for index in range(0, len(output), 1):
-        output_test_x.append(output[index][0])
-        output_test_y.append(output[index][1])
-        output_test_z.append(output[index][2])
+    for index in range(0, len(output_test), 1):
+        output_test_x.append(output_test[index][0])
+        output_test_y.append(output_test[index][1])
+        output_test_z.append(output_test[index][2])
 
-    for index in range(0, len(y_train), 1):
+    for index in range(0, len(y_test), 1):
         y_test_x.append(y_test[index][0])
         y_test_y.append(y_test[index][1])
         y_test_z.append(y_test[index][2])
