@@ -26,10 +26,10 @@ n_hidden1 = 64
 n_hidden2 = 64
 n_hidden3 = 64
 n_input = 98
-n_output = 1
+n_output = 3
 #Learning parameters
-learning_constant = 0.002
-number_epochs = 1000
+learning_constant = 0.004
+number_epochs = 10
 
 #Defining the input and the output
 X = tf.placeholder("float", [None, n_input])
@@ -70,7 +70,8 @@ def multilayer_perceptron(input_d):
 #Create model
 neural_network = multilayer_perceptron(X)
 #Define loss and optimizer
-loss_op = tf.reduce_mean(tf.math.squared_difference(neural_network,Y))
+#Root Mean Square Difference is the loss function
+loss_op = tf.math.sqrt(tf.reduce_mean(tf.math.squared_difference(neural_network,Y)))
 #loss_op = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=neural_network,labels=Y))
 optimizer = tf.train.AdamOptimizer(learning_constant).minimize(loss_op)
 
@@ -118,13 +119,63 @@ with tf.Session() as sess:
 
     # print("Accuracy:", np.square(accuracy.eval({X: X_train, Y: y_train})).mean())
     output=neural_network.eval({X: X_train})
-    plt.plot(y_train, 'r', output, 'b')
-    plt.ylabel('Train Results')
+    print("length of output ", len(output))
+    output_train_x = []
+    output__train_y = []
+    output__train_z = []
+    output_test_x = []
+    output_test_y = []
+    output_test_z = []
+    y_train_x = []
+    y_train_y = []
+    y_train_z = []
+    y_test_x = []
+    y_test_y = []
+    y_test_z = []
+    for index in range(0, len(output), 1):
+        output_train_x.append(output[index][0])
+        output__train_y.append(output[index][1])
+        output__train_z.append(output[index][2])
+
+    for index in range(0, len(y_train), 1):
+        y_train_x.append(y_train[index][0])
+        y_train_y.append(y_train[index][1])
+        y_train_z.append(y_train[index][2])
+
+    plt.plot(y_train_x, 'r', output_train_x, 'b')
+    plt.ylabel('Train Results X')
+    plt.show()
+
+    plt.plot(y_train_y, 'r', output__train_y, 'b')
+    plt.ylabel('Train Results Y')
+    plt.show()
+
+    plt.plot(y_train_z, 'r', output__train_z, 'b')
+    plt.ylabel('Train Results Z')
     plt.show()
 
     output_test = neural_network.eval({X: X_test})
-    plt.plot(y_test, 'r', output_test, 'b')
-    plt.ylabel('Test results')
+
+    for index in range(0, len(output), 1):
+        output_test_x.append(output[index][0])
+        output_test_y.append(output[index][1])
+        output_test_z.append(output[index][2])
+
+    for index in range(0, len(y_train), 1):
+        y_test_x.append(y_test[index][0])
+        y_test_y.append(y_test[index][1])
+        y_test_z.append(y_test[index][2])
+
+    plt.plot(y_test_x, 'r', output_test_x, 'b')
+    plt.ylabel('Test results X')
+    plt.show()
+
+    plt.plot(y_test_y, 'r', output_test_y, 'b')
+    plt.ylabel('Test results Y')
+    plt.show()
+
+    plt.plot(y_test_z, 'r', output_test_z, 'b')
+    plt.ylabel('Test results Z')
     plt.show()
     # MSE
     print("MSE:", loss_op.eval({X: X_test, Y: y_test}))
