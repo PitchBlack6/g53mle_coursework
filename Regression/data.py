@@ -37,5 +37,3 @@ def obtain_data():
     #labels = temp.transpose()  # 367616, 1
     return features, label
 
-
-obtain_data()
