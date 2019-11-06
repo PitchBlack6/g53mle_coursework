@@ -22,14 +22,14 @@ def generate_batch(batch_size):
     return batch_features, batch_labels
 
 #Network parameters
-n_hidden1 = 64
-n_hidden2 = 64
-n_hidden3 = 64
+n_hidden1 = 256
+n_hidden2 = 256
+n_hidden3 = 256
 n_input = 98
 n_output = 3
 #Learning parameters
 learning_constant = 0.004
-number_epochs = 10
+number_epochs = 100
 
 #Defining the input and the output
 X = tf.placeholder("float", [None, n_input])
@@ -96,6 +96,9 @@ with tf.Session() as sess:
             actual_epoch = epoch + counter
             X_train, X_test = features[train_index], features[test_index]
             y_train, y_test = labels[train_index], labels[test_index]
+            print("X_train ", X_train)
+            #X_train = Data.normalize_coordinate(X_train)
+            #X_test = Data.normalize_coordinate(X_test)
             num_batch = int(len(X_train) / batch_size)
             for batch_counter in range(num_batch):
                 batch_features, batch_labels = generate_batch(batch_size)
@@ -121,8 +124,8 @@ with tf.Session() as sess:
     output=neural_network.eval({X: X_train})
     print("length of output ", len(output))
     output_train_x = []
-    output__train_y = []
-    output__train_z = []
+    output_train_y = []
+    output_train_z = []
     output_test_x = []
     output_test_y = []
     output_test_z = []
@@ -134,8 +137,8 @@ with tf.Session() as sess:
     y_test_z = []
     for index in range(0, len(output), 1):
         output_train_x.append(output[index][0])
-        output__train_y.append(output[index][1])
-        output__train_z.append(output[index][2])
+        output_train_y.append(output[index][1])
+        output_train_z.append(output[index][2])
 
     for index in range(0, len(y_train), 1):
         y_train_x.append(y_train[index][0])
@@ -146,11 +149,11 @@ with tf.Session() as sess:
     plt.ylabel('Train Results X')
     plt.show()
 
-    plt.plot(y_train_y, 'r', output__train_y, 'b')
+    plt.plot(y_train_y, 'r', output_train_y, 'b')
     plt.ylabel('Train Results Y')
     plt.show()
 
-    plt.plot(y_train_z, 'r', output__train_z, 'b')
+    plt.plot(y_train_z, 'r', output_train_z, 'b')
     plt.ylabel('Train Results Z')
     plt.show()
 
