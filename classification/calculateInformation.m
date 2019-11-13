@@ -1,6 +1,7 @@
-function output = calculateInformation(p , n)
-    %CALCULATEINFORMATION Summary of this function goes here
-    %   Detailed explanation goes here
+function output = calculateInformation(p, n)
+    % This function calculates the amount of information at a certain node,
+    % also known as entropy. The value ranges between 0 and 1. The goal is
+    % to have the entropy as low as possible.
     if p == 0  && n == 0
         output = 0;
     else
@@ -15,4 +16,3 @@ function output = calculateInformation(p , n)
         end
     end
 end 
-
