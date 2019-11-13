@@ -1,7 +1,7 @@
-toLoadModel = true;
+toLoadModel = false;
 % Hyper parameters
-train_size = 2000;
-test_size = 2000;
+train_size = 64000;
+test_size = 16000;
 % The value of the entropy that is considered good enough. Training the
 % tree to a value of 0 entropy would take too long and lead to overfitting.
 minimumEntropy = 0.01;
