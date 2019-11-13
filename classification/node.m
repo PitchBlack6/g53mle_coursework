@@ -5,15 +5,21 @@ classdef node
         % Used to identify the node
         nodeID
         % Pointer to left and right nodes, only for non-leaf nodes
-        leftNode
-        rightNode
+        kids = node.empty(2, 0)
         % Which of the 98 attributes to test, only for non-leaf nodes
-        attributeNumber
+        attribute
         % The threshold for the attributes, only for non-leaf nodes
-        attributeThreshold
+        threshold
         % Output class, either 0 or 1, only for leaf nodes
         class
+        
         isLeafNode
+        % Used for drawing decision tree
+        index
+        X
+        Y
+        op
+        
     end
     methods (Static)
        function out = setgetNodeCounter(data)
@@ -55,9 +61,9 @@ classdef node
                 % iterate through attributes and thresholds to find highest
                 % gain
                 highestGain = 0;                
-                for attribute = 1:size(features, 2)
-                    for threshold = 0: thresholdIncrement: 1
-                        [featureLeft, labelLeft, featureRight, labelRight] = splitDataset(features, labels, attribute, threshold);
+                for att = 1:size(features, 2)
+                    for thresh = 0: thresholdIncrement: 1
+                        [featureLeft, labelLeft, featureRight, labelRight] = splitDataset(features, labels, att, thresh);
                         % calculate gain
                         [pLeft, nLeft] = calcPandN(labelLeft);
                         [pRight, nRight] =calcPandN(labelRight);
@@ -66,30 +72,30 @@ classdef node
                         % store highest gain, and the corresponding att and thresh
                         if gain>highestGain
                             highestGain = gain;
-                            obj.attributeNumber = attribute;
-                            obj.attributeThreshold = threshold;
+                            obj.attribute = att;
+                            obj.threshold = thresh;
                         end
                         
                     end
                 end
                 % split data based on that att and thresh
                 fprintf('Highest Gain: %f \n', round(highestGain, 2, 'significant'));
-                [featureLeft, labelLeft, featureRight, labelRight] = splitDataset(features, labels, obj.attributeNumber, obj.attributeThreshold);
+                [featureLeft, labelLeft, featureRight, labelRight] = splitDataset(features, labels, obj.attribute, obj.threshold);
                 % Left and right nodes
-                obj.leftNode = node;
-                obj.leftNode = obj.leftNode.fit(featureLeft, labelLeft, minimumEntropy, thresholdIncrement);
-                obj.rightNode = node;
-                obj.rightNode = obj.rightNode.fit(featureRight, labelRight, minimumEntropy, thresholdIncrement);
+                obj.kids{1} = node;
+                obj.kids{1} = obj.kids{1}.fit(featureLeft, labelLeft, minimumEntropy, thresholdIncrement);
+                obj.kids{2} = node;
+                obj.kids{2} = obj.kids{2}.fit(featureRight, labelRight, minimumEntropy, thresholdIncrement);
             end
         end
         function prediction = predict(obj, feature)
             if obj.isLeafNode == 1
                 prediction = obj.class;
             else
-                if feature(obj.attributeNumber)<obj.attributeThreshold
-                    prediction = obj.leftNode.predict(feature);
+                if feature(obj.attribute)<obj.threshold
+                    prediction = obj.kids{1}.predict(feature);
                 else
-                    prediction = obj.rightNode.predict(feature);
+                    prediction = obj.kids{2}.predict(feature);
                 end
             end
         end
@@ -97,8 +103,8 @@ classdef node
         function totalNodes = getTotalNodes(obj)
             totalNodes = 1;
             if obj.isLeafNode == 0
-                totalNodes = totalNodes + obj.leftNode.getTotalNodes;
-                totalNodes = totalNodes + obj.rightNode.getTotalNodes;
+                totalNodes = totalNodes + obj.kids{1}.getTotalNodes;
+                totalNodes = totalNodes + obj.kids{2}.getTotalNodes;
             end
         end
         function saveModel(obj)
@@ -114,12 +120,12 @@ classdef node
             if obj.isLeafNode == 1
                 outputModel(obj.nodeID, 6) = obj.class;        
             else
-                outputModel(obj.nodeID, 2) = obj.leftNode.nodeID;
-                outputModel(obj.nodeID, 3) = obj.rightNode.nodeID;
-                outputModel(obj.nodeID, 4) = obj.attributeNumber;
-                outputModel(obj.nodeID, 5) = obj.attributeThreshold;
-                outputModel = obj.leftNode.saveModelRecur(outputModel);
-                outputModel = obj.rightNode.saveModelRecur(outputModel);
+                outputModel(obj.nodeID, 2) = obj.kids{1}.nodeID;
+                outputModel(obj.nodeID, 3) = obj.kids{2}.nodeID;
+                outputModel(obj.nodeID, 4) = obj.attribute;
+                outputModel(obj.nodeID, 5) = obj.threshold;
+                outputModel = obj.kids{1}.saveModelRecur(outputModel);
+                outputModel = obj.kids{2}.saveModelRecur(outputModel);
             end
         end
         function obj = loadModel(obj, model)
@@ -127,17 +133,17 @@ classdef node
             obj = obj.loadModelRecur(model);
         end
         function obj = loadModelRecur(obj, model)
-            obj.attributeNumber = model(obj.nodeID, 4);
-            obj.attributeThreshold = model(obj.nodeID, 5);
+            obj.attribute = model(obj.nodeID, 4);
+            obj.threshold = model(obj.nodeID, 5);
             obj.class = model(obj.nodeID, 6);
             obj.isLeafNode = model(obj.nodeID, 7);
             if obj.isLeafNode ~= 1
-                obj.leftNode = node;
-                obj.leftNode.nodeID = model(obj.nodeID, 2);
-                obj.leftNode = obj.leftNode.loadModelRecur(model);
-                obj.rightNode = node;
-                obj.rightNode.nodeID = model(obj.nodeID, 3);
-                obj.rightNode = obj.rightNode.loadModelRecur(model);
+                obj.kids{1} = node;
+                obj.kids{1}.nodeID = model(obj.nodeID, 2);
+                obj.kids{1} = obj.kids{1}.loadModelRecur(model);
+                obj.kids{2} = node;
+                obj.kids{2}.nodeID = model(obj.nodeID, 3);
+                obj.kids{2} = obj.kids{2}.loadModelRecur(model);
             end
         end
     end

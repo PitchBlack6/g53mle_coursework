@@ -1,10 +1,10 @@
-toLoadModel = false;
+toLoadModel = true;
 % Hyper parameters
-train_size = 1000;
-test_size = 500;
+train_size = 2000;
+test_size = 2000;
 % The value of the entropy that is considered good enough. Training the
 % tree to a value of 0 entropy would take too long and lead to overfitting.
-minimumEntropy = 0.1;
+minimumEntropy = 0.01;
 % The threshold ranges between 0 and 1. We can't possible test all the
 % values in between, so we need to set the increment value. The lower the
 % value, the more precise the results will be, but it would take long to
@@ -51,6 +51,7 @@ else
     % Saving model
     head_node.saveModel;
 end
+DrawDecisionTree(head_node, "Test");
 
 % Predictions
 disp('Making Predictions');
@@ -66,6 +67,6 @@ for i = 1:test_size
     end
 end
 timeTaken = toc;
-fprintf('Test Error: %f%%, Time taken: %fs', round(error/500*100, 3, 'significant'), round(timeTaken, 2, "decimals"));
+fprintf('Test Error: %f%%, Time taken: %fs', round(error/test_size*100, 3, 'significant'), round(timeTaken, 2, "decimals"));
 
 
