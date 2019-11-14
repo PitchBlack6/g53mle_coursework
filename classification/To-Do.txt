@@ -1,0 +1,13 @@
+Completed
+Data normalisation
+Shuffle data
+Data split 80-20
+Save and Load model
+Model training
+Model visulaisation
+Model evaluation
+
+To-Do
+Tuning hyper-parameters
+K-fold cross validation
+TP, TN, FP, FN, recall, precision, f-measure
