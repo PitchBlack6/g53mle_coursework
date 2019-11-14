@@ -1,7 +1,7 @@
 toLoadModel = false;
 % Hyper parameters
-train_size = 2000;
-test_size = 20000;
+train_size = 70000;
+test_size = 12000;
 % The value of the entropy that is considered good enough. Training the
 % tree to a value of 0 entropy would take too long and lead to overfitting.
 minimumEntropy = 0.2;
@@ -27,8 +27,8 @@ featureX = normaliseData(featureX);
 featureY = normaliseData(featureY);
 disp('Data Normalized');
 % Feature extraction
-featureY = featureExtractionY(featureY);
-featureX = featureExtractionY(featureX);
+% featureY = featureExtractionY(featureY);
+% featureX = featureExtractionY(featureX);
 features = [featureX featureY];
 % Shuffle data
 [features, label1] = shuffleData(features, label1);
