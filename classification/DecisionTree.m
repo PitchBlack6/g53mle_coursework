@@ -1,10 +1,10 @@
 toLoadModel = false;
 % Hyper parameters
-train_size = 64000;
-test_size = 16000;
+train_size = 1000;
+test_size = 2000;
 % The value of the entropy that is considered good enough. Training the
 % tree to a value of 0 entropy would take too long and lead to overfitting.
-minimumEntropy = 0.01;
+minimumEntropy = 0.1;
 % The threshold ranges between 0 and 1. We can't possible test all the
 % values in between, so we need to set the increment value. The lower the
 % value, the more precise the results will be, but it would take long to
@@ -25,7 +25,10 @@ disp('Data Loaded');
 % Normalise x and y
 featureX = normaliseData(featureX);
 featureY = normaliseData(featureY);
+% featureY = featureExtractionY(featureY);
 features = [featureX featureY];
+[features, label1] = shuffleData(features, label1);
+
 trainFeatures = features(1:train_size, :);
 trainLabels = label1(1:train_size, :);
 testFeatures = features(train_size+1:train_size+test_size, :);
