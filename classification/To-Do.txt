@@ -6,8 +6,8 @@ Save and Load model
 Model training
 Model visulaisation
 Model evaluation
+Tuning hyper-parameters (minEntropy = 0.2, thresholdIncrement = 0.01)
 
 To-Do
-Tuning hyper-parameters
 K-fold cross validation
 TP, TN, FP, FN, recall, precision, f-measure
