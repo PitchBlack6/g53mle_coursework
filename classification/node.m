@@ -7,17 +7,20 @@ classdef node
         % Pointer to left and right nodes, only for non-leaf nodes
         kids = node.empty(2, 0)
         % Which of the 98 attributes to test, only for non-leaf nodes
-        attribute
+        attriko;bute
         % The threshold for the attributes, only for non-leaf nodes
         threshold
         % Output class, either 0 or 1, only for leaf nodes
         class
+        counterLeft
+        counterRight
         
         isLeafNode
         % Used for drawing decision tree
         index
         X
         Y
+        
         op
         
     end
@@ -63,7 +66,7 @@ classdef node
                 highestGain = 0;                
                 for att = 1:size(features, 2)
                     for thresh = 0: thresholdIncrement: 1
-                        [featureLeft, labelLeft, featureRight, labelRight] = splitDataset(features, labels, att, thresh);
+                        [featureLeft, labelLeft, featureRight, labelRight, counterLeft, counterRight] = splitDataset(features, labels, att, thresh);
                         % calculate gain
                         [pLeft, nLeft] = calcPandN(labelLeft);
                         [pRight, nRight] =calcPandN(labelRight);
@@ -80,8 +83,10 @@ classdef node
                 end
                 % split data based on that att and thresh
                 fprintf('Highest Gain: %f \n', round(highestGain, 2, 'significant'));
-                [featureLeft, labelLeft, featureRight, labelRight] = splitDataset(features, labels, obj.attribute, obj.threshold);
+                [featureLeft, labelLeft, featureRight, labelRight, left, right] = splitDataset(features, labels, obj.attribute, obj.threshold);
                 % Left and right nodes
+                obj.counterLeft = left;
+                obj.counterRight = right;
                 obj.kids{1} = node;
                 obj.kids{1} = obj.kids{1}.fit(featureLeft, labelLeft, minimumEntropy, thresholdIncrement);
                 obj.kids{2} = node;
@@ -99,7 +104,6 @@ classdef node
                 end
             end
         end
-        
         function totalNodes = getTotalNodes(obj)
             totalNodes = 1;
             if obj.isLeafNode == 0
