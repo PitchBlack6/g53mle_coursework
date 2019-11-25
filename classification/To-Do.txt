@@ -1,0 +1,14 @@
+Completed
+Data normalisation
+Shuffle data
+Data split 80-20
+Save and Load model
+Model training
+Model visulaisation
+Model evaluation
+Tuning hyper-parameters (minEntropy = 0.2, thresholdIncrement = 0.01)
+Feature extraction, does not improve the results
+
+To-Do
+K-fold cross validation
+TP, TN, FP, FN, recall, precision, f-measure
