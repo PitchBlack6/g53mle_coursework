@@ -31,8 +31,15 @@ sumWeights = 0;
 sumBias = 0;
 sumMeasure = 0;
 for n = 1 : 10
-    currentTrainFeatures = reshape(trainFeatures(n, :,  :), size(trainFeatures, 2), size(trainFeatures, 3));
-    currentTrainLabels = reshape(trainLabels(n, :,  :), size(trainLabels, 2), size(trainLabels, 3));
+    
+    dummyFeature = trainFeatures;
+    dummyFeature(n, :, :) = [];
+    dummyLabel = trainLabels;
+    dummyLabel(n, :, :) = [];
+    
+    currentTrainFeatures = reshape(dummyFeature, size(trainFeatures, 2)*9, size(trainFeatures, 3));
+    currentTrainLabels = reshape(dummyLabel, size(trainLabels, 2)*9, size(trainLabels, 3));
+    % change box constraint 
     Mdl1 = fitcsvm(currentTrainFeatures, currentTrainLabels, 'KernelFunction', 'linear', 'BoxConstraint', 1);
     sumWeights = sumWeights + Mdl1.Beta;
     sumBias = sumBias + Mdl1.Bias;
