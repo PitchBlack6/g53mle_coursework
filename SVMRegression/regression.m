@@ -2,11 +2,6 @@ train_size = 10000;
 test_size = 1000;
 
 label = csvread('angle.csv',1,0);
-%label1 = label(:,1);
-%label2 = label(:,2);
-%label3 = label(:,3);
-%label4 = label(:,4);
-%label5 = label(:,5);
 featureX = load('predx_for_classification.csv');
 featureY = load('predy_for_classification.csv');
 disp('Data Loaded');
@@ -16,10 +11,10 @@ featureY = normaliseData(featureY);
 disp('Data Normalized');
 
 % get first column
-temp = label(:,1);
+labels = label(:,1);
 
 % transpose 
-labels = temp.';
+% labels = temp.';
 
 features = [featureX featureY];
 
@@ -35,26 +30,62 @@ testFeatures = features(train_size+1:train_size+test_size, :);
 testLabels = labels(train_size+1:train_size+test_size);
 disp('Data Split');
 
+% k-fold
+[trainFeatures, trainLabels] = spiltDataset(trainFeatures, trainLabels);
+
+% Model 1
+sumWeights = 0;
+sumBias = 0;
+
+sumRMSE = 0;
+
 % Cross-validate two SVM regression models using 5-fold cross-validation. 
 % For both models, specify to standardize the predictors. 
 % For one of the models, specify to train using the default linear kernel, and the Gaussian kernel for the other model.
 % Mdl = fitrsvm(trainFeatures,trainLabels, 'Standardized', true, 'Kfold', 5);
 
-Mdl = fitrsvm(trainFeatures,trainLabels, 'KernelFunction', 'gaussian', 'BoxConstraint', 1);
-disp('Data trained');
 
-Mdl.ConvergenceInfo.Converged;
-iter = Mdl.NumIterations;
+for n = 1:10 
+    dummyFeature = trainFeatures;
+    dummyFeature(n, :, :) = [];
+    dummyLabel = trainLabels;
+    dummyLabel(n, :, :) = [];
+    
+    currentTrainFeatures = reshape(dummyFeature, size(trainFeatures, 2) * 9, size(trainFeatures, 3));
+    currentTrainLabels = reshape(dummyLabel, size(trainLabels, 2)*9, size(trainLabels, 3));
+    Mdll = fitrsvm(currentTrainFeatures,currentTrainLabels, 'KernelFunction', 'linear', 'BoxConstraint', 1);
+    
+    sumWeights = sumWeights + Mdl1.Beta;
+    sumBias = sumBias + Mdl1.Bias;
+    predictions = predict(Mdl1, testFeatures);
+    sumRMSE = sumRMSE + sqrt(mean((predictions - testLabels).^2));
+   
+end
+
+disp(sumRMSE/10);
+
+avgWeights = sumWeights/10;
+aveBias = sumBias/10;
+
+predictions = 1 : length(testLabels);
+
+for i = 1 : size(testFeatures)
+    score = testFeatures(i, :) * avgWeights + aveBias;
+    predictions(i) = score;
+end
+
+% get RMSE
+RMSE = sqrt(mean((predictions - testLabels).^2));
+disp(mean(RMSE));
+
+
+% Mdl.ConvergenceInfo.Converged;
+% iter = Mdl.NumIterations;
 
 
 
 % Compute the resubstitution (in-sample) mean-squared error for the new model.
-lStd = resubLoss(Mdl);
-disp(lStd);
-fprintf('Num of iterations for convergence: %d', iter);
+% lStd = resubLoss(Mdl);
+% disp(lStd);
+% fprintf('Num of iterations for convergence: %d', iter);
 
-% make predictions
-predictions = predict(Mdl, testFeatures);
-% disp(predictions);
-RMSE = sqrt(mean((predictions - testLabels).^2));
-disp(mean(RMSE));
