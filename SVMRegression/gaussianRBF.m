@@ -31,7 +31,7 @@ testLabels = labels(train_size+1:train_size+test_size);
 disp('Data Split');
 
 % k-fold
-[trainFeatures, trainLabels] = spiltDataset(trainFeatures, trainLabels);
+[trainFeatures, trainLabels] = splitDataset(trainFeatures, trainLabels);
 
 % Model 1
 sumWeights = 0;
@@ -55,7 +55,7 @@ for n = 1:10
     currentTrainLabels = reshape(dummyLabel, size(trainLabels, 2)*9, size(trainLabels, 3));
     
     % using standardized data gives lower average RMSE
-    Mdl1 = fitrsvm(currentTrainFeatures, currentTrainLabels, 'Standardize', true, 'KernelFunction', 'gaussian', 'BoxConstraint', 1);
+    Mdl1 = fitrsvm(currentTrainFeatures, currentTrainLabels, 'KernelFunction','gaussian','KernelScale',0.2,'BoxConstraint', 1);
     sigma = Mdl1.Sigma;
     
     % sumWeights = sumWeights + Mdl1.Beta;
@@ -69,12 +69,9 @@ for n = 1:10
    
 end
 
-
 % disp average RMSE
 disp(sumRMSE/10);
 
-% sigma is a vector of 1x98
-disp(sumSigma/10);
 
 
 
