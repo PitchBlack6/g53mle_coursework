@@ -37,6 +37,7 @@ disp('Data Split');
 sumWeights = 0;
 sumBias = 0;
 sumRMSE = 0;
+sumVectors = 0;
 
 % Cross-validate two SVM regression models using 5-fold cross-validation. 
 % For both models, specify to standardize the predictors. 
@@ -55,7 +56,7 @@ for n = 1:10
     currentTrainLabels = reshape(dummyLabel, size(trainLabels, 2)*9, size(trainLabels, 3));
     
     % using standardized data gives lower average RMSE
-    Mdl1 = fitrsvm(currentTrainFeatures, currentTrainLabels, 'KernelFunction','gaussian','KernelScale',0.2,'BoxConstraint', 1);
+    Mdl1 = fitrsvm(currentTrainFeatures, currentTrainLabels, 'KernelFunction','gaussian','KernelScale',2.0,'BoxConstraint', 1);
     sigma = Mdl1.Sigma;
     
     % sumWeights = sumWeights + Mdl1.Beta;
@@ -66,11 +67,26 @@ for n = 1:10
     
     % get RMSE by comparing predictions with testLabels
     sumRMSE = sumRMSE + sqrt(mean((predictions - testLabels).^2));
+    
+    sv = size(Mdl1.SupportVectors,1);
+    sumVectors = sumVectors + sv;
    
 end
 
+% get size of observations
+obs = size(currentTrainFeatures,1);
+disp(obs);
+
+% get average support vectors
+avgSV = sumVectors/10;
+
+% get percent
+output = calculatePercentSupportVector(avgSV, obs);
+
 % disp average RMSE
 disp(sumRMSE/10);
+
+fprintf('Percentage: %f\n', output);
 
 
 

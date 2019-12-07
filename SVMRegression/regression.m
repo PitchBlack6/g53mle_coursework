@@ -31,7 +31,7 @@ testLabels = labels(train_size+1:train_size+test_size);
 disp('Data Split');
 
 % k-fold
-[trainFeatures, trainLabels] = spiltDataset(trainFeatures, trainLabels);
+[trainFeatures, trainLabels] = splitDataset(trainFeatures, trainLabels);
 
 % Model 1
 sumWeights = 0;
@@ -53,7 +53,7 @@ for n = 1:10
     
     currentTrainFeatures = reshape(dummyFeature, size(trainFeatures, 2) * 9, size(trainFeatures, 3));
     currentTrainLabels = reshape(dummyLabel, size(trainLabels, 2)*9, size(trainLabels, 3));
-    Mdll = fitrsvm(currentTrainFeatures,currentTrainLabels, 'KernelFunction', 'linear', 'BoxConstraint', 1);
+    Mdll = fitrsvm(currentTrainFeatures,currentTrainLabels, 'KernelFunction', 'linear','BoxConstraint', 1);
     
     sumWeights = sumWeights + Mdl1.Beta;
     sumBias = sumBias + Mdl1.Bias;
@@ -77,15 +77,4 @@ end
 % get RMSE
 RMSE = sqrt(mean((predictions - testLabels).^2));
 disp(mean(RMSE));
-
-
-% Mdl.ConvergenceInfo.Converged;
-% iter = Mdl.NumIterations;
-
-
-
-% Compute the resubstitution (in-sample) mean-squared error for the new model.
-% lStd = resubLoss(Mdl);
-% disp(lStd);
-% fprintf('Num of iterations for convergence: %d', iter);
 

@@ -36,7 +36,6 @@ disp('Data Split');
 % Model 1
 sumWeights = 0;
 sumBias = 0;
-
 sumRMSE = 0;
 
 % Cross-validate two SVM regression models using 5-fold cross-validation. 
@@ -53,28 +52,21 @@ for n = 1:10
     
     currentTrainFeatures = reshape(dummyFeature, size(trainFeatures, 2) * 9, size(trainFeatures, 3));
     currentTrainLabels = reshape(dummyLabel, size(trainLabels, 2)*9, size(trainLabels, 3));
-    Mdll = fitrsvm(currentTrainFeatures,currentTrainLabels, 'KernelFunction', 'polynomial');
+    Mdl1 = fitrsvm(currentTrainFeatures,currentTrainLabels, 'KernelFunction', 'polynomial', 'PolynomialOrder', 4,'BoxConstraint',1);
     
-    sumWeights = sumWeights + Mdl1.Beta;
     sumBias = sumBias + Mdl1.Bias;
     predictions = predict(Mdl1, testFeatures);
     sumRMSE = sumRMSE + sqrt(mean((predictions - testLabels).^2));
+    
+    fprintf('iter: %d\n', n);
    
 end
 
+% (a*b + r).^d
+% get average bias 
+avgBias = sumBias/10;
+
+disp('Average RMSE: ')
 disp(sumRMSE/10);
 
-avgWeights = sumWeights/10;
-aveBias = sumBias/10;
-
-predictions = 1 : length(testLabels);
-
-for i = 1 : size(testFeatures)
-    score = testFeatures(i, :) * avgWeights + aveBias;
-    predictions(i) = score;
-end
-
-% get RMSE
-RMSE = sqrt(mean((predictions - testLabels).^2));
-disp(mean(RMSE));
 
