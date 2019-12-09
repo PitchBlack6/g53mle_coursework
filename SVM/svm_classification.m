@@ -1,6 +1,6 @@
 % Hyper-parameters
-train_size = 2000;
-test_size = 2000;
+train_size = 10000;
+test_size = 1000;
 % Load data
 label = load('label.csv');
 label1 = label(:,1);

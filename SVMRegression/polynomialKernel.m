@@ -37,6 +37,7 @@ disp('Data Split');
 sumWeights = 0;
 sumBias = 0;
 sumRMSE = 0;
+sumVectors = 0;
 
 % Cross-validate two SVM regression models using 5-fold cross-validation. 
 % For both models, specify to standardize the predictors. 
@@ -52,11 +53,14 @@ for n = 1:10
     
     currentTrainFeatures = reshape(dummyFeature, size(trainFeatures, 2) * 9, size(trainFeatures, 3));
     currentTrainLabels = reshape(dummyLabel, size(trainLabels, 2)*9, size(trainLabels, 3));
-    Mdl1 = fitrsvm(currentTrainFeatures,currentTrainLabels, 'KernelFunction', 'polynomial', 'PolynomialOrder', 4,'BoxConstraint',1);
+    Mdl1 = fitrsvm(currentTrainFeatures,currentTrainLabels, 'KernelFunction', 'polynomial', 'PolynomialOrder',1,'Epsilon',5,'BoxConstraint',1);
+    vectors = size(Mdl1.SupportVectors,1);
     
     sumBias = sumBias + Mdl1.Bias;
     predictions = predict(Mdl1, testFeatures);
-    sumRMSE = sumRMSE + sqrt(mean((predictions - testLabels).^2));
+    RMSE = sqrt(mean((predictions - testLabels).^2));
+    sumRMSE = sumRMSE + RMSE;
+    sumVectors = sumVectors + vectors;
     
     fprintf('iter: %d\n', n);
    
@@ -66,7 +70,20 @@ end
 % get average bias 
 avgBias = sumBias/10;
 
+% get size of observations
+obs = size(currentTrainFeatures,1);
+disp(obs);
+
+% get average support vectors
+avgSV = sumVectors/10;
+fprintf('Average vectors: %f\n', avgSV);
+
+% get percent
+output = calculatePercentSupportVector(avgSV, obs);
+
+
 disp('Average RMSE: ')
 disp(sumRMSE/10);
+fprintf('Percentage: %f\n', output);
 
 
