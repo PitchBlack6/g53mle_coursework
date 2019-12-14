@@ -1,4 +1,4 @@
-train_size = 10000;
+train_size = 1000;
 test_size = 1000;
 
 label = csvread('angle.csv',1,0);
@@ -53,8 +53,15 @@ for n = 1:10
     
     currentTrainFeatures = reshape(dummyFeature, size(trainFeatures, 2) * 9, size(trainFeatures, 3));
     currentTrainLabels = reshape(dummyLabel, size(trainLabels, 2)*9, size(trainLabels, 3));
-    Mdl1 = fitrsvm(currentTrainFeatures,currentTrainLabels, 'KernelFunction', 'polynomial', 'PolynomialOrder',1,'Epsilon',5,'BoxConstraint',1);
+    Mdl1 = fitrsvm(currentTrainFeatures,currentTrainLabels, 'KernelFunction', 'polynomial', 'PolynomialOrder',2,'Epsilon',5,'BoxConstraint',1);
     vectors = size(Mdl1.SupportVectors,1);
+    
+     % data to fit into network
+    ANNtrainFeatures = currentTrainFeatures.';
+    ANNtrainLabels = currentTrainLabels.';
+    
+    % pass data to neural network 
+    ANNerror(n) = artificialNeuralNetwork(ANNtrainFeatures, ANNtrainLabels);
     
     sumBias = sumBias + Mdl1.Bias;
     predictions = predict(Mdl1, testFeatures);
@@ -66,13 +73,12 @@ for n = 1:10
    
 end
 
+% get size of observations
+obs = size(currentTrainFeatures,1);
+
 % (a*b + r).^d
 % get average bias 
 avgBias = sumBias/10;
-
-% get size of observations
-obs = size(currentTrainFeatures,1);
-disp(obs);
 
 % get average support vectors
 avgSV = sumVectors/10;
@@ -81,9 +87,10 @@ fprintf('Average vectors: %f\n', avgSV);
 % get percent
 output = calculatePercentSupportVector(avgSV, obs);
 
+fprintf('Average RMSE: %f\n', sumRMSE/10);
+fprintf('Percentage of support vectors: %f\n', output);
 
-disp('Average RMSE: ')
-disp(sumRMSE/10);
-fprintf('Percentage: %f\n', output);
-
+% comparison 
+[pValue] = comparisonFunc(regError, ANNerror);
+fprintf('P value: %d\n', pValue);
 

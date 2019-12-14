@@ -1,4 +1,4 @@
-train_size = 10000;
+train_size = 1000;
 test_size = 1000;
 
 label = csvread('angle.csv',1,0);
@@ -57,7 +57,13 @@ for n = 1:10
     
     % using standardized data gives lower average RMSE
     Mdl1 = fitrsvm(currentTrainFeatures, currentTrainLabels, 'KernelFunction','gaussian','KernelScale',5,'BoxConstraint', 1);
-    sigma = Mdl1.Sigma;
+    
+    % data to fit into network
+    ANNtrainFeatures = currentTrainFeatures.';
+    ANNtrainLabels = currentTrainLabels.';
+    
+    % pass data to neural network 
+    ANNerror(n) = artificialNeuralNetwork(ANNtrainFeatures, ANNtrainLabels);
     
     % sumWeights = sumWeights + Mdl1.Beta;
     sumBias = sumBias + Mdl1.Bias;
@@ -65,8 +71,10 @@ for n = 1:10
     % make predictions using support vectors
     predictions = predict(Mdl1, testFeatures);
     
+    RMSE = sqrt(mean((predictions - testLabels).^2));
+    
     % get RMSE by comparing predictions with testLabels
-    sumRMSE = sumRMSE + sqrt(mean((predictions - testLabels).^2));
+    sumRMSE = sumRMSE + RMSE;
     
     sv = size(Mdl1.SupportVectors,1);
     sumVectors = sumVectors + sv;
@@ -75,7 +83,6 @@ end
 
 % get size of observations
 obs = size(currentTrainFeatures,1);
-disp(obs);
 
 % get average support vectors
 avgSV = sumVectors/10;
@@ -84,9 +91,14 @@ avgSV = sumVectors/10;
 output = calculatePercentSupportVector(avgSV, obs);
 
 % disp average RMSE
-disp(sumRMSE/10);
+fprintf('Gaussian RBF average error: %f\n', sumRMSE/10);
 
-fprintf('Percentage: %f\n', output);
+% disp percentage of vectors
+fprintf('Percentage of vectors: %f\n', output);
+
+% comparison 
+[pValue] = comparisonFunc(regError, ANNerror);
+fprintf('P value: %d\n', pValue);
 
 
 
