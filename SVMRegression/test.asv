@@ -1,3 +1,0 @@
-x = []
-
-[h, p, ci, stats] = ttest2
