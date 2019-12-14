@@ -44,8 +44,7 @@ sumVectors = 0;
 % For one of the models, specify to train using the default linear kernel, and the Gaussian kernel for the other model.
 % Mdl = fitrsvm(trainFeatures,trainLabels, 'Standardized', true, 'Kfold', 5);
 
-% train data
-disp('train data');
+
 for n = 1:10 
     dummyFeature = trainFeatures;
     dummyFeature(n, :, :) = [];
@@ -54,54 +53,44 @@ for n = 1:10
     
     currentTrainFeatures = reshape(dummyFeature, size(trainFeatures, 2) * 9, size(trainFeatures, 3));
     currentTrainLabels = reshape(dummyLabel, size(trainLabels, 2)*9, size(trainLabels, 3));
+    Mdl1 = fitrsvm(currentTrainFeatures,currentTrainLabels, 'KernelFunction', 'polynomial', 'PolynomialOrder',2,'Epsilon',5,'BoxConstraint',1);
+    vectors = size(Mdl1.SupportVectors,1);
     
-    % using standardized data gives lower average RMSE
-    Mdl1 = fitrsvm(currentTrainFeatures, currentTrainLabels, 'KernelFunction','gaussian','KernelScale',5,'BoxConstraint', 1);
-    
-    % data to fit into network
+     % data to fit into network
     ANNtrainFeatures = currentTrainFeatures.';
     ANNtrainLabels = currentTrainLabels.';
     
     % pass data to neural network 
     ANNerror(n) = artificialNeuralNetwork(ANNtrainFeatures, ANNtrainLabels);
     
-    % sumWeights = sumWeights + Mdl1.Beta;
     sumBias = sumBias + Mdl1.Bias;
-    
-    % make predictions using support vectors
     predictions = predict(Mdl1, testFeatures);
-    
     RMSE = sqrt(mean((predictions - testLabels).^2));
-    
-    % get RMSE by comparing predictions with testLabels
     sumRMSE = sumRMSE + RMSE;
+    sumVectors = sumVectors + vectors;
     
-    sv = size(Mdl1.SupportVectors,1);
-    sumVectors = sumVectors + sv;
+    fprintf('iter: %d\n', n);
    
 end
 
 % get size of observations
 obs = size(currentTrainFeatures,1);
 
+% (a*b + r).^d
+% get average bias 
+avgBias = sumBias/10;
+
 % get average support vectors
 avgSV = sumVectors/10;
+fprintf('Average vectors: %f\n', avgSV);
 
 % get percent
 output = calculatePercentSupportVector(avgSV, obs);
 
-% disp average RMSE
-fprintf('Gaussian RBF average error: %f\n', sumRMSE/10);
-
-% disp percentage of vectors
-fprintf('Percentage of vectors: %f\n', output);
+fprintf('Average RMSE: %f\n', sumRMSE/10);
+fprintf('Percentage of support vectors: %f\n', output);
 
 % comparison 
 [pValue] = comparisonFunc(regError, ANNerror);
 fprintf('P value: %d\n', pValue);
-
-
-
-
-
 

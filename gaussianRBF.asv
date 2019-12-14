@@ -83,6 +83,7 @@ end
 
 % get size of observations
 obs = size(currentTrainFeatures,1);
+disp
 
 % get average support vectors
 avgSV = sumVectors/10;
